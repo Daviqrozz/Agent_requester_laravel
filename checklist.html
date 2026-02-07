@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checklist do Projeto</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background:#f4f4f5; margin:0; padding:20px; }
+    .container { max-width:900px; margin:0 auto; background:#fff; padding:24px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.06); }
+    h1 { margin-top:0; font-size:24px; }
+    h2 { margin-top:24px; font-size:18px; border-left:4px solid #2563eb; padding-left:8px; }
+    ul { list-style:none; padding-left:0; }
+    li { display:flex; align-items:flex-start; gap:8px; padding:6px 0; }
+    li label { flex:1; cursor:pointer; }
+    .section { margin-top:8px; padding:8px 12px; border-radius:8px; background:#f9fafb; }
+    .counter { font-size:13px; color:#6b7280; margin-bottom:4px; }
+    .checkbox { width:18px; height:18px; margin-top:2px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Checklist da Aplicação – Assistente de Revenda</h1>
+
+    <div class="section" data-section="base">
+      <div class="counter" id="counter-base"></div>
+      <h2>1. Base do Projeto</h2>
+      <ul>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="auth-funcionando" />
+          <label>Confirmar autenticação funcionando (login, registro, logout, middleware auth).</label>
+        </li>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="layout-autenticado" />
+          <label>Criar tela do chatbot.</label>
+        </li>
+        
+      </ul>
+    </div>
+
+    <div class="section" data-section="chat">
+      <div class="counter" id="counter-chat"></div>
+      <h2>2. Chat e Integração com IA</h2>
+      <ul>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="rota-api-chat" />
+          <label>Criar rota API para chat (POST /api/chat) protegida por auth.</label>
+        </li>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="contrato-api" />
+          <label>Definir contrato da API: payload de entrada, resposta do agente, erros.</label>
+        </li>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="integracao-ia" />
+          <label>Integrar com provedor de IA (endpoint, chave, timeout).</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section" data-section="dominio">
+      <div class="counter" id="counter-dominio"></div>
+      <h2>3. Domínio de Negócio</h2>
+      <ul>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="modelar-tabelas" />
+          <label>Modelar tabelas: clientes, produtos/veículos, estoque, vendas, OS.</label>
+        </li>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="migrations-models" />
+          <label>Criar migrations, models e relacionamentos principais.</label>
+        </li>
+        <li>
+          <input class="checkbox" type="checkbox" data-id="cruds-basicos" />
+          <label>Implementar CRUDs básicos via Inertia.</label>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'revenda_checklist_v1';
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function updateCounters() {
+      const sections = document.querySelectorAll('.section');
+      const state = loadState();
+
+      sections.forEach(section => {
+        const checkboxes = section.querySelectorAll('.checkbox');
+        const done = Array.from(checkboxes).filter(cb => state[cb.dataset.id]).length;
+        const total = checkboxes.length;
+        const counter = section.querySelector('.counter');
+        counter.textContent = `Concluído: ${done}/${total}`;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = loadState();
+      const checkboxes = document.querySelectorAll('.checkbox');
+
+      // aplica estado salvo
+      checkboxes.forEach(cb => {
+        if (state[cb.dataset.id]) {
+          cb.checked = true;
+        }
+        cb.addEventListener('change', () => {
+          const current = loadState();
+          current[cb.dataset.id] = cb.checked;
+          saveState(current);
+          updateCounters();
+        });
+      });
+
+      updateCounters();
+    });
+  </script>
+</body>
+</html>
