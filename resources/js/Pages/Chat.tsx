@@ -24,7 +24,7 @@ export default function Chat() {
       body: JSON.stringify({ message })
     })
     const data = await response.json()
-    console.log(data)
+
     return data
   }
 
@@ -63,7 +63,7 @@ export default function Chat() {
       ]);
     }
   }
-
+console.log(messages)
   return (
     <AppLayout>
       <Head title="Agente" />
@@ -92,7 +92,7 @@ export default function Chat() {
               </div>
             </div>
           )}
-
+          
           {messages.map((m, i) => (
             <div
               key={i}
