@@ -9,8 +9,10 @@ type ChatMessage = {
 
 export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-
+  const [loading, setLoading] = useState(false)
   const [input, setInput] = useState('');
+
+
   const CHAT_URL = 'http://estocar-ai-chat.test/api/chat';
   const Headers = {
     'content-type': 'application/json',
@@ -24,7 +26,6 @@ export default function Chat() {
       body: JSON.stringify({ message })
     })
     const data = await response.json()
-
     return data
   }
 
@@ -33,7 +34,7 @@ export default function Chat() {
 
     const text = input.trim();
     if (!text) return;
-    
+
 
     // 1) adiciona mensagem do usuário no histórico
     setMessages(prev => [...prev,
@@ -41,9 +42,12 @@ export default function Chat() {
     ]);
     setInput('');
 
+    setLoading(true)
+
     // 2) chama API
     try {
       const data = await newMessage(text);
+      console.log(data)
 
       // 3) adiciona resposta do agente
       setMessages(prev => [
@@ -61,9 +65,11 @@ export default function Chat() {
           content: 'Erro ao falar com o agente.',
         },
       ]);
+    } finally {
+      setLoading(false)
     }
   }
-console.log(messages)
+
   return (
     <AppLayout>
       <Head title="Agente" />
@@ -92,8 +98,9 @@ console.log(messages)
               </div>
             </div>
           )}
-          
+
           {messages.map((m, i) => (
+
             <div
               key={i}
               className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'
@@ -122,6 +129,22 @@ console.log(messages)
               </div>
             </div>
           ))}
+
+          {loading && (
+            <div className="flex justify-start">
+              <div className="flex gap-3 max-w-xs">
+                <img
+                  src="https://ui-avatars.com/api/?name=Agent+Bot&background=3b82f6&color=fff&size=32"
+                  alt="Agent"
+                  className="w-8 h-8 rounded-full flex-shrink-0"
+                />
+                <div className="px-4 py-2 rounded-lg text-sm bg-white text-black border border-gray-200 rounded-bl-none">
+                  Digitando...
+                </div>
+              </div>
+            </div>
+          )}
+          
         </div>
 
         <form

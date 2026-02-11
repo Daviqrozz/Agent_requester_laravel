@@ -21,7 +21,12 @@ class ChatController extends Controller
             ],401);
         } 
 
-        return response()->json($this->chatService->reply($message));
+       $agent_reply = $this->chatService->reply($message);
+
+       return response()->json([
+        'resposta' => $agent_reply['content'],
+        'role' => $agent_reply['role']
+       ]);
 
     }
 }
